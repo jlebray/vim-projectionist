@@ -336,6 +336,14 @@ function! g:projectionist_transformations.vim(input, o) abort
   return a:input
 endfunction
 
+function! g:projectionist_transformations.first_dir(input, o) abort
+  return substitute(a:input, '/.*$', '', '')
+endfunction
+
+function! g:projectionist_transformations.drop_first_dir(input, o) abort
+    return substitute(a:input, '^[^/]*/', '', '')
+endfunction
+
 function! s:expand_placeholder(placeholder, expansions) abort
   let transforms = split(a:placeholder[1:-2], '|')
   if has_key(a:expansions, get(transforms, 0, '}'))
@@ -369,13 +377,7 @@ endfunction
 let s:valid_key = '^\%([^*{}]*\*\*[^*{}]\{2\}\)\=[^*{}]*\*\=[^*{}]*$'
 
 function! s:match(file, pattern) abort
-  if a:pattern =~# '^[^*{}]*\*[^*{}]*$'
-    let pattern = s:slash(substitute(a:pattern, '\*', '**/*', ''))
-  elseif a:pattern =~# '^[^*{}]*\*\*[^*{}]\+\*[^*{}]*$'
-    let pattern = s:slash(a:pattern)
-  else
-    return ''
-  endif
+  let pattern = s:slash(a:pattern)
   let [prefix, infix, suffix] = split(pattern, '\*\*\=', 1)
   let file = s:slash(a:file)
   if !s:startswith(file, prefix) || !s:endswith(file, suffix)
