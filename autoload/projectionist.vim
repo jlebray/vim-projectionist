@@ -377,7 +377,14 @@ endfunction
 let s:valid_key = '^\%([^*{}]*\*\*[^*{}]\{2\}\)\=[^*{}]*\*\=[^*{}]*$'
 
 function! s:match(file, pattern) abort
-  let pattern = s:slash(a:pattern)
+  if a:pattern =~# '^[^*{}]*\*[^*{}]*$'
+    let pattern = s:slash(substitute(a:pattern, '\*', '**/*', ''))
+  elseif a:pattern =~# '^[^*{}]*(\*\*[^*{}]\+)\+\*[^*{}]*$'
+    let pattern = s:slash(a:pattern)
+  else
+    return ''
+  endif
+
   let [prefix, infix, suffix] = split(pattern, '\*\*\=', 1)
   let file = s:slash(a:file)
   if !s:startswith(file, prefix) || !s:endswith(file, suffix)
